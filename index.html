@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Viewer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@100..900&family=Noto+Serif+Gujarati:wght@100..900&display=swap');
+
+        @font-face {
+            font-family: 'GujDua';
+            src: url(https://cdn.jsdelivr.net/gh/alihusains/custom-fonts-gujarati@main/guj_dua.ttf) format('truetype');
+        }
+
+
+        @font-face {
+            font-family: 'Araaaaa';
+            src: url(https://cdn.jsdelivr.net/gh/alihusains/custom-fonts-gujarati@main/muhammad-qurani.ttf)format('truetype');
+        }
+
+        div {
+
+            padding: 10px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+
+            width: 90%;
+            margin: auto;
+            background: #FAEBD7;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .surah-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .surah-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #fafafa;
+            cursor: pointer;
+            border-radius: 5px #1B365D;
+        }
+
+        .ayat {
+
+            padding: 10px;
+            border-bottom: 1px solid #1B365D;
+            text-align: left;
+        }
+
+        .ayat-ar {
+            text-align: center;
+            font-family: 'Araaaaa', serif;
+            font-size: clamp(1.9rem, 2.1vw, 2.3rem);
+            line-height: 1.8;
+            direction: rtl;
+            color: #1B365D;
+        }
+
+        .arabic {
+            font-family: 'Araaaaa', serif;
+            direction: rtl;
+            font-weight: bold;
+
+            font-size: clamp(1.9rem, 2.1vw, 2.3rem);
+            line-height: 1.8;
+
+
+        }
+
+        .ayat-guj {
+            text-align: center;
+            font-family: 'Noto Serif Gujarati', serif;
+            font-size: clamp(1.5rem, 1.9vw, 1.9rem);
+            line-height: 1.6;
+
+            direction: ltr;
+        }
+
+
+        .ayat-notes {
+            text-align: left;
+            font-family: 'Noto Serif Gujarati', serif;
+            direction: ltr;
+            font-size: clamp(1rem, 1.5vw, 1.4rem);
+            line-height: 1.6;
+
+        }
+
+        .ayat-translit {
+            text-align: center;
+            font-family: 'GujDua', sans-serif;
+
+
+            direction: ltr;
+            font-size: clamp(1.5rem, 1.9vw, 1.9rem);
+            line-height: 1.6;
+        }
+
+        .toggle-container label {
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Gujarati Quran</h1>
+        <div id="surahView">
+            <h2>Select a Surah</h2>
+            <ul id="surahList" class="surah-list"></ul>
+        </div>
+        <div id="ayatView" style="display: none;">
+            <button onclick="goBack()">Back</button>
+            <h2 id="surahTitle"></h2>
+            <div class="toggle-container">
+                <label><input type="checkbox" id="toggleArabic" checked> Arabic</label>
+                <label><input type="checkbox" id="toggleTranslation" checked> Translation</label>
+                <label><input type="checkbox" id="toggleTransliteration" checked> Transliteration</label>
+                <label><input type="checkbox" id="toggleNotes" checked> Ayat Notes</label>
+
+            </div>
+            <div id="ayatList"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadJSON() {
+            const response = await fetch('guj_quran_new.json'); // Ensure the JSON file is in the same directory
+            const data = await response.json();
+            displaySurahs(data);
+        }
+
+        function displaySurahs(surahs) {
+            const surahList = document.getElementById('surahList');
+            surahList.innerHTML = '';
+            surahs.forEach(surah => {
+                const li = document.createElement('li');
+                // li.textContent = `${surah.sura_id} . ${<span class='ayat-ar'>${surah.sura_name_ar}</span>} - ${<span class='ayat-guj'>${surah.sura_name_guj}</span>}`;
+
+                var sura_name_ar = "<span class='arabic'>[ " + surah.sura_name_ar + "] </span>";
+                var sura_type = "<span class='ayat-guj'>Type: " + surah.sura_type + "</span>  ";
+                var sura_ayat = "<span class='ayat-guj'>&nbsp;&nbsp;     ||  Ayats: " + surah.sura_ayat + "</span>&nbsp;&nbsp;";
+
+                var sura_name_guj = "<span class='ayat-guj'>" + surah.sura_name_guj + "</span>";
+                var abc = `${surah.sura_id}.  ${sura_name_guj} -  ${sura_name_ar} ${sura_ayat} ${sura_type} `;
+                li.innerHTML = `${surah.sura_id}.  ${sura_name_guj} -  ${sura_name_ar} ${sura_ayat} ${sura_type} `;
+                li.onclick = () => loadSurah(surah);
+                surahList.appendChild(li);
+            });
+        }
+
+        function loadSurah(surah) {
+            var sura_name_ar = "<span class='arabic'>[ " + surah.sura_name_ar + "] </span>";
+
+
+            document.getElementById('surahView').style.display = 'none';
+            document.getElementById('ayatView').style.display = 'block';
+            document.getElementById('surahTitle').innerHTML = `${surah.sura_name_guj} - ${sura_name_ar} <br> (Ayat: ${surah.sura_ayat}) (Type: ${surah.sura_type})`;
+            const ayatList = document.getElementById('ayatList');
+            ayatList.innerHTML = '';
+
+            for (let i = 0; i < surah.ayat_ar.length; i++) {
+                const div = document.createElement('div');
+                div.classList.add('ayat');
+                div.innerHTML = `
+                    <strong>Ayat ${i + 1} :</strong>
+                    <div class="ayat-ar">${surah.ayat_ar[i]}</div>
+                    <div class="ayat-translit">${surah.transliteration[i] || ''}</div>
+                      <div class="ayat-guj">${surah.ayat_guj[i] || ''}</div>
+                    <div class="ayat-notes">${surah.ayat_notes[i] || ''}</div>
+                    
+                `;
+                ayatList.appendChild(div);
+            }
+            updateVisibility();
+        }
+
+        function goBack() {
+            document.getElementById('surahView').style.display = 'block';
+            document.getElementById('ayatView').style.display = 'none';
+        }
+
+        function updateVisibility() {
+            document.querySelectorAll('.ayat-ar').forEach(el => el.style.display = document.getElementById('toggleArabic').checked ? 'block' : 'none');
+            document.querySelectorAll('.ayat-guj').forEach(el => el.style.display = document.getElementById('toggleTranslation').checked ? 'block' : 'none');
+            document.querySelectorAll('.ayat-translit').forEach(el => el.style.display = document.getElementById('toggleTransliteration').checked ? 'block' : 'none');
+            document.querySelectorAll('.ayat-notes').forEach(el => el.style.display = document.getElementById('toggleNotes').checked ? 'block' : 'none');
+
+        }
+
+        document.getElementById('toggleArabic').addEventListener('change', updateVisibility);
+        document.getElementById('toggleTranslation').addEventListener('change', updateVisibility);
+        document.getElementById('toggleTransliteration').addEventListener('change', updateVisibility);
+        document.getElementById('toggleNotes').addEventListener('change', updateVisibility);
+
+
+        loadJSON();
+    </script>
+</body>
+
+</html>
