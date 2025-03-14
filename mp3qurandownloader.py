@@ -3,18 +3,19 @@ import os
 import requests
 
 # Get the Downloads folder path
-downloads_folder = os.path.expanduser("./basit/")
+downloads_folder = os.path.expanduser("./juzwise/")
 
 # Ensure the Downloads folder exists
 if not os.path.exists(downloads_folder):
     os.makedirs(downloads_folder)
 
 # Base URL
-base_url = "https://server7.mp3quran.net/basit/"
+# base_url = "https://server7.mp3quran.net/basit/"
+base_url = "https://www.imamhussainresearch.com/audio/Quran/para_number_"
 
 # Loop through i = 001 to 114
 for i in range(1, 115):
-    file_name = f"{i:03}.mp3"  # Format as 001, 002, ..., 114
+    file_name = f"{i:3}.mp3"  # Format as 001, 002, ..., 114
     file_url = f"{base_url}{file_name}"
     file_path = os.path.join(downloads_folder, file_name)
     
