@@ -140,7 +140,7 @@
 
     <script>
         async function loadJSON() {
-            const response = await fetch('guj_quran_new.json'); // Ensure the JSON file is in the same directory
+            const response = await fetch('guj_quran_new_without_cdn.json'); // Ensure the JSON file is in the same directory
             const data = await response.json();
             displaySurahs(data);
         }
